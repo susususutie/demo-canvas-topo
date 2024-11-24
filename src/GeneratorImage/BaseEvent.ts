@@ -1,43 +1,65 @@
-export default class BaseEvent {
-  _handlerMap: Map<string, ((e: any) => void)[]> = new Map()
+interface IBaseEvent {
+  /**
+   * 监听事件
+   * @param type 事件类型
+   * @param handler 事件回调
+   */
+  on(type: string, handler: (e:any) => void) :void;
+  /**
+   * 移除事件监听函数
+   * @param type 事件类型
+   * @param handler 监听函数
+   */
+  off(type: string, handler?: (e:any) => void) :void;
+  /**
+   * 触发事件
+   * @param type 事件类型
+   * @param payload 事件参数
+   */
+  emit(type: string, payload?: any): void;
+}
 
-  emit(type: string) {
-    const handlers = this._handlerMap.get(type)
-    if (handlers && handlers.length > 0) {
-      handlers.forEach(handler => handler({target:this}))
+export default class BaseEvent implements IBaseEvent {
+  #_handlerMap: Map<string, Set<((e: any) => void)>> = new Map()
+
+  emit(type: string, payload?: any) {
+    const handlers = this.#_handlerMap.get(type)
+    if (handlers && handlers.size > 0) {
+      handlers.forEach(handler => handler({target:this, payload}))
     }
   }
 
   on(type: string, handler: (e: any) => void) {
-    if (!this._handlerMap.has(type)) {
-      this._handlerMap.set(type, [])
+    if (!this.#_handlerMap.has(type)) {
+      this.#_handlerMap.set(type, new Set())
     }
-    const handlers = this._handlerMap.get(type) as ((e: any) => void)[]
-    handlers.push(handler)
+    const handlers = this.#_handlerMap.get(type)!
+    handlers.add(handler)
   }
 
   off(type: string, handler?: (e: any) => void) {
     // off all events
     if (type === '*') {
-      this._handlerMap.clear()
+      this.#_handlerMap.clear()
       return
     }
 
-    if (!this._handlerMap.has(type)) {
+    if (!this.#_handlerMap.has(type)) {
       return
     }
-    const handlers = this._handlerMap.get(type)
-    if (handlers) {
-      if (!handler) {
-        this._handlerMap.delete(type)
-        return
-      }
-      const newHandlers = handlers.filter(i => i !== handler)
-      if (newHandlers.length > 0) {
-        this._handlerMap.set(type, newHandlers)
-      } else {
-        this._handlerMap.delete(type)
-      }
+    const handlers = this.#_handlerMap.get(type)
+    if(!handlers || !handlers.size) return
+
+    if (!handler) {
+      handlers.clear()
+      this.#_handlerMap.delete(type)
+      return
+    }
+
+    handlers.delete(handler)
+    if (!handlers.size) {
+      handlers.clear()
+      this.#_handlerMap.delete(type)
     }
   }
 
