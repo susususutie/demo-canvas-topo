@@ -1,7 +1,7 @@
 import NodeUtils from './NodeUtils'
 import type { AbstractNode, ClientRect, MarginRect, Pos } from './type'
 
-export default class CircleNode extends NodeUtils implements AbstractNode  {
+export default class CircleNode extends NodeUtils implements AbstractNode {
   _id: string
   _centerX: number = 0
   _centerY: number = 0
@@ -9,8 +9,8 @@ export default class CircleNode extends NodeUtils implements AbstractNode  {
   _borderWidth: number = 2
 
   _text: string
-  
-  constructor(options: {id:string, text: string}) {
+
+  constructor(options: { id: string; text: string }) {
     super()
     this._id = options.id
     this._text = options.text
@@ -46,8 +46,8 @@ export default class CircleNode extends NodeUtils implements AbstractNode  {
   }
 
   getMarginRect(): MarginRect {
-    const {width, height, left, top} =this.getClientRect()
-    return {width, height, left, top}
+    const { width, height, left, top } = this.getClientRect()
+    return { width, height, left, top }
   }
 
   draw(ctx: CanvasRenderingContext2D) {

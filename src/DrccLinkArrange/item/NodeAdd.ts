@@ -3,13 +3,13 @@ import { Node, NodeCfg } from './Node'
 import { Group } from 'konva/lib/Group'
 import { Arrange } from '..'
 
-type NodeAddCfg = NodeCfg 
+type NodeAddCfg = NodeCfg
 
 export class NodeAdd extends Node {
   type = 'add'
   size = 32
 
-  constructor( cfg: NodeAddCfg) {
+  constructor(cfg: NodeAddCfg) {
     super(cfg)
     this.rootShape = this.draw()
   }
@@ -27,7 +27,12 @@ export class NodeAdd extends Node {
   }
 
   draw(): Group {
-    const id = this.id, size = 32, x = this.x, y = this.y, strokeWidth = 1, cornerRadius = 2
+    const id = this.id,
+      size = 32,
+      x = this.x,
+      y = this.y,
+      strokeWidth = 1,
+      cornerRadius = 2
 
     const group = new Konva.Group({
       id: `node-${id}-group`,
@@ -98,7 +103,7 @@ export class NodeAdd extends Node {
 
   #eventBind(arrange: Arrange) {
     const group = this.rootShape
-    if(!group) return
+    if (!group) return
 
     group.on('click', ev => {
       arrange.emit('node:click', {
@@ -125,7 +130,5 @@ export class NodeAdd extends Node {
     })
   }
 
-  update(): void {
-
-  }
+  update(): void {}
 }

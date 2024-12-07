@@ -6,30 +6,126 @@ import { Node } from './item/Node'
 import { Edge } from './item/Edge'
 import { Arrange } from '.'
 
-type ClickEvent<K> = {item: K, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
+type ClickEvent<K> = {
+  item: K
+  shape: Shape | Group
+  shapeName: string
+  x: number
+  y: number
+  canvasX: number
+  canvasY: number
+}
 
 // eslint-disable-next-line no-unused-vars
 type EventHandler<K extends keyof EventMap> = (this: ArrangeEvent, ev: EventMap[K]) => unknown
 
 type EventMap = {
   // 全局事件
-  'beforeupdate': {item: Arrange, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
-  'afterupdate': {item: Arrange, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
+  beforeupdate: {
+    item: Arrange
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
+  afterupdate: {
+    item: Arrange
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
   // canvas 事件(即画布空白处)
   'canvas:click': ClickEvent<Arrange>
-  'canvas:mouseenter': {item: Arrange, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
-  'canvas:mousemove': {item: Arrange, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
-  'canvas:mouseleave': {item: Arrange, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
-  
+  'canvas:mouseenter': {
+    item: Arrange
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
+  'canvas:mousemove': {
+    item: Arrange
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
+  'canvas:mouseleave': {
+    item: Arrange
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
+
   'node:click': ClickEvent<Node>
-  'node:mouseenter': {item: Node, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
-  'node:mousemove': {item: Node, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
-  'node:mouseleave': {item: Node, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
+  'node:mouseenter': {
+    item: Node
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
+  'node:mousemove': {
+    item: Node
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
+  'node:mouseleave': {
+    item: Node
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
 
   'edge:click': ClickEvent<Edge>
-  'edge:mouseenter': {item: Edge, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
-  'edge:mousemove': {item: Edge, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
-  'edge:mouseleave': {item: Edge, shape: Shape | Group, shapeName: string, x: number, y: number, canvasX: number, canvasY: number}
+  'edge:mouseenter': {
+    item: Edge
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
+  'edge:mousemove': {
+    item: Edge
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
+  'edge:mouseleave': {
+    item: Edge
+    shape: Shape | Group
+    shapeName: string
+    x: number
+    y: number
+    canvasX: number
+    canvasY: number
+  }
 }
 
 export class ArrangeEvent {

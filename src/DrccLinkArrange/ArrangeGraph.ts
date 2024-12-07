@@ -14,76 +14,89 @@ type NodeItem = string // { id: string, type: 'single' | 'double'}
 export type LayoutItem = NodeItem | (NodeItem | NodeItem[])[]
 
 type ChainEnd = {
-  type: 'end',
-  id: 'end',
-  prev: ChainStart | ChainSingle | ChainGroup | ChainAdd,
-  next: null,
+  type: 'end'
+  id: 'end'
+  prev: ChainStart | ChainSingle | ChainGroup | ChainAdd
+  next: null
 }
 type ChainAdd = {
-  type: 'add',
-  id: string,
-  prev: ChainStart | ChainSingle | ChainGroup,
-  next: ChainSingle | ChainGroup | ChainEnd,
+  type: 'add'
+  id: string
+  prev: ChainStart | ChainSingle | ChainGroup
+  next: ChainSingle | ChainGroup | ChainEnd
 }
 type ChainSingle = {
-  type: 'single',
-  id: string,
-  prev: ChainStart | ChainSingle | ChainGroup | ChainAdd,
-  next: ChainSingle | ChainGroup | ChainEnd | ChainAdd,
+  type: 'single'
+  id: string
+  prev: ChainStart | ChainSingle | ChainGroup | ChainAdd
+  next: ChainSingle | ChainGroup | ChainEnd | ChainAdd
 }
 type ChainGroupSingle = {
-  type: 'groupSingle',
-  id: string,
-  parent: ChainGroup,
-  prev: null | ChainGroupAdd | ChainGroupSingle,
-  next: null | ChainGroupAdd | ChainGroupSingle,
+  type: 'groupSingle'
+  id: string
+  parent: ChainGroup
+  prev: null | ChainGroupAdd | ChainGroupSingle
+  next: null | ChainGroupAdd | ChainGroupSingle
 }
 type ChainGroupAdd = {
-  type: 'groupAdd',
-  id: string,
-  parent: ChainGroup,
-  prev: null | ChainGroupSingle,
-  next: null | ChainGroupSingle,
+  type: 'groupAdd'
+  id: string
+  parent: ChainGroup
+  prev: null | ChainGroupSingle
+  next: null | ChainGroupSingle
 }
 type ChainGroup = {
-  type: 'group',
-  id: string,
-  prev: ChainStart | ChainSingle | ChainGroup | ChainAdd,
-  next: ChainSingle | ChainGroup | ChainEnd | ChainAdd,
+  type: 'group'
+  id: string
+  prev: ChainStart | ChainSingle | ChainGroup | ChainAdd
+  next: ChainSingle | ChainGroup | ChainEnd | ChainAdd
   rows: (ChainGroupAdd | ChainGroupSingle)[][]
 }
 type ChainStart = {
-  type: 'start',
-  id: 'start',
-  prev: null,
+  type: 'start'
+  id: 'start'
+  prev: null
   next: ChainAdd | ChainSingle | ChainGroup | ChainEnd
 }
 type ChainItem = ChainStart | ChainAdd | ChainSingle | ChainGroup | ChainEnd
-type SizeType = ChainStart['type'] | ChainAdd['type'] | ChainSingle['type'] | ChainEnd['type'] | 'groupAdd' | 'groupSingle'
+type SizeType =
+  | ChainStart['type']
+  | ChainAdd['type']
+  | ChainSingle['type']
+  | ChainEnd['type']
+  | 'groupAdd'
+  | 'groupSingle'
 type Chain = {
   start: ChainStart
   end: ChainEnd
 }
 
 type Config = {
-  layout: LayoutItem[],
-  showAdd?: boolean,
-  equidistant?: boolean,
-  gapH?: number,
-  gapV?: number,
+  layout: LayoutItem[]
+  showAdd?: boolean
+  equidistant?: boolean
+  gapH?: number
+  gapV?: number
 }
 
-export type NodeShape = {
-  id: string,
-  type: 'start' | 'add' | 'single' | 'end',
-  rect: {x: number, y: number, width: number, height: number},
-} | {
-  id: string,
-  type: 'group',
-  rect: {x: number, y: number, width: number, height: number},
-  rows: {id: string, type: 'groupSingle' | 'groupAdd', parent: string, rect: {x: number, y: number, width: number, height: number}}[][]
-}
-export type EdgeShape = {id: string, source: string, target: string}
+export type NodeShape =
+  | {
+      id: string
+      type: 'start' | 'add' | 'single' | 'end'
+      rect: { x: number; y: number; width: number; height: number }
+    }
+  | {
+      id: string
+      type: 'group'
+      rect: { x: number; y: number; width: number; height: number }
+      rows: {
+        id: string
+        type: 'groupSingle' | 'groupAdd'
+        parent: string
+        rect: { x: number; y: number; width: number; height: number }
+      }[][]
+    }
+export type EdgeShape = { id: string; source: string; target: string }
 
 export class ArrangeGraph extends ArrangeEvent {
   #layout: LayoutItem[]
@@ -92,7 +105,7 @@ export class ArrangeGraph extends ArrangeEvent {
   #gapH: number
   #gapV: number
   #chain: Chain
-  
+
   constructor(config: Config) {
     super()
 
@@ -104,18 +117,18 @@ export class ArrangeGraph extends ArrangeEvent {
     try {
       this.#layout = JSON.parse(JSON.stringify(config.layout))
     } catch (error) {
-      this.#layout = config.layout      
+      this.#layout = config.layout
     }
 
     // 1. layout -> chain
-    const start = { type: 'start', id: 'start', prev: null, next: null} as unknown as ChainStart
-    const end = { type: 'end', id: 'end', prev: start, next: null} as ChainEnd
+    const start = { type: 'start', id: 'start', prev: null, next: null } as unknown as ChainStart
+    const end = { type: 'end', id: 'end', prev: start, next: null } as ChainEnd
     start.next = end
-    this.#chain = {start, end}
+    this.#chain = { start, end }
     if (this.#layout.length > 0) {
       this.#initChain()
     } else if (this.#showAdd) {
-      const add: ChainAdd = { type: 'add', id: this.#addId(), prev: start, next: null} as unknown as ChainAdd
+      const add: ChainAdd = { type: 'add', id: this.#addId(), prev: start, next: null } as unknown as ChainAdd
       start.next = add
       add.next = end
       end.prev = add
@@ -131,35 +144,35 @@ export class ArrangeGraph extends ArrangeEvent {
 
   #_itemsMap: Map<string, Edge | Node | Combo> = new Map()
   _genItemsMap() {
-    this.#forEachChain((current) => {
+    this.#forEachChain(current => {
       switch (current.type) {
-      case 'start':{
-        const node = new NodeCircle({id: current.id, label: '开始' })
-        this.#_itemsMap.set(current.id, node)
-        break
-      }
-      case 'end': {
-        const node = new NodeCircle({id: current.id, label: '结束' })
-        this.#_itemsMap.set(current.id, node)
-        break
-      }
-      case 'add': {
-        const node = new NodeAdd({id: current.id })
-        this.#_itemsMap.set(current.id, node)
-        break
-      }
-      case 'group': {
-        const node = new ComboNormal({id: current.id, rows: current.rows})
-        this.#_itemsMap.set(current.id, node)
-        break
-      }
-      case 'single': {
-        const node = new NodeNormal({ id: current.id })
-        this.#_itemsMap.set(current.id, node)
-        break
-      }
-      default:
-        break
+        case 'start': {
+          const node = new NodeCircle({ id: current.id, label: '开始' })
+          this.#_itemsMap.set(current.id, node)
+          break
+        }
+        case 'end': {
+          const node = new NodeCircle({ id: current.id, label: '结束' })
+          this.#_itemsMap.set(current.id, node)
+          break
+        }
+        case 'add': {
+          const node = new NodeAdd({ id: current.id })
+          this.#_itemsMap.set(current.id, node)
+          break
+        }
+        case 'group': {
+          const node = new ComboNormal({ id: current.id, rows: current.rows })
+          this.#_itemsMap.set(current.id, node)
+          break
+        }
+        case 'single': {
+          const node = new NodeNormal({ id: current.id })
+          this.#_itemsMap.set(current.id, node)
+          break
+        }
+        default:
+          break
       }
     })
     // this._itemsMap.set()
@@ -170,11 +183,17 @@ export class ArrangeGraph extends ArrangeEvent {
     this.#layout.forEach((item, index) => {
       if (Array.isArray(item)) {
         if (this.#showAdd) {
-          const add: ChainAdd = { type: 'add', id: this.#addId(), prev: latest, next: null} as unknown as ChainAdd
+          const add: ChainAdd = { type: 'add', id: this.#addId(), prev: latest, next: null } as unknown as ChainAdd
           latest.next = add
           latest = add
         }
-        const group = { type: 'group', id: `group${index}`, prev: latest, next: null, rows: []} as unknown as ChainGroup 
+        const group = {
+          type: 'group',
+          id: `group${index}`,
+          prev: latest,
+          next: null,
+          rows: [],
+        } as unknown as ChainGroup
         group.rows = item.map<(ChainGroupSingle | ChainGroupAdd)[]>(_rows => {
           const rows = Array.isArray(_rows) ? _rows : [_rows]
 
@@ -182,21 +201,39 @@ export class ArrangeGraph extends ArrangeEvent {
           return rows.flatMap((rItem, rIndex, arr) => {
             const result = []
             if (this.#showAdd) {
-              const add: ChainGroupAdd = { type: 'groupAdd', id: this.#addId(), prev: rowLatest, next: null, parent: group} as ChainGroupAdd
+              const add: ChainGroupAdd = {
+                type: 'groupAdd',
+                id: this.#addId(),
+                prev: rowLatest,
+                next: null,
+                parent: group,
+              } as ChainGroupAdd
               if (rowLatest) {
                 rowLatest.next = add
               }
               rowLatest = add
               result.push(add)
             }
-            const gSingle: ChainGroupSingle = { type: 'groupSingle', id: rItem, prev: rowLatest, next: null, parent: group}
+            const gSingle: ChainGroupSingle = {
+              type: 'groupSingle',
+              id: rItem,
+              prev: rowLatest,
+              next: null,
+              parent: group,
+            }
             if (rowLatest) {
               rowLatest.next = gSingle
             }
             rowLatest = gSingle
             result.push(gSingle)
             if (rIndex === arr.length - 1 && this.#showAdd) {
-              const add: ChainGroupAdd = { type: 'groupAdd', id: this.#addId(), prev: rowLatest, next: null, parent: group} as ChainGroupAdd
+              const add: ChainGroupAdd = {
+                type: 'groupAdd',
+                id: this.#addId(),
+                prev: rowLatest,
+                next: null,
+                parent: group,
+              } as ChainGroupAdd
               if (rowLatest) {
                 rowLatest.next = add
               }
@@ -210,17 +247,17 @@ export class ArrangeGraph extends ArrangeEvent {
         latest = group
       } else {
         if (this.#showAdd) {
-          const add: ChainAdd = { type: 'add', id: this.#addId(), prev: latest, next: null} as unknown as ChainAdd
+          const add: ChainAdd = { type: 'add', id: this.#addId(), prev: latest, next: null } as unknown as ChainAdd
           latest.next = add
           latest = add
         }
-        const single = { type: 'single', id: item, prev: latest, next: null} as unknown as ChainSingle
+        const single = { type: 'single', id: item, prev: latest, next: null } as unknown as ChainSingle
         latest.next = single
         latest = single
-      }  
+      }
     })
     if (this.#showAdd) {
-      const add: ChainAdd = { type: 'add', id: this.#addId(), prev: latest, next: null} as unknown as ChainAdd
+      const add: ChainAdd = { type: 'add', id: this.#addId(), prev: latest, next: null } as unknown as ChainAdd
       latest.next = add
       latest = add
     }
@@ -229,19 +266,19 @@ export class ArrangeGraph extends ArrangeEvent {
   }
 
   static TYPE_SIZE: Record<SizeType, [number, number]> = {
-    'add': [32, 32],
-    'start': [48, 48],
-    'single': [72, 72],
-    'end': [48, 48],
-    'groupAdd': [32, 32],
-    'groupSingle': [72, 72],
+    add: [32, 32],
+    start: [48, 48],
+    single: [72, 72],
+    end: [48, 48],
+    groupAdd: [32, 32],
+    groupSingle: [72, 72],
   }
 
   #layoutChain() {
     let endX = 100
     let startY = 100
 
-    // 沿着 #chain 遍历整条链路, 根据不同类型计算其尺寸, 从左到右排布链路 
+    // 沿着 #chain 遍历整条链路, 根据不同类型计算其尺寸, 从左到右排布链路
     this.#forEachChain((current, index) => {
       // 1. 尺寸计算
       const instance = this.#_itemsMap.get(current.id) as Node | Combo
@@ -251,11 +288,11 @@ export class ArrangeGraph extends ArrangeEvent {
       // 等间距: 根据节点尺寸动态调整间距, 使间距相同 +---XXX---+---X---
       // 非等距: 节点中心点之间的固定间距, 尺寸大的节点两侧间距会偏小 +--XXX--+---X---
       if (this.#equidistant) {
-        x = index === 0 ? endX : (endX + this.#gapH + width / 2)
+        x = index === 0 ? endX : endX + this.#gapH + width / 2
         endX = x + width / 2
       } else {
-        x = index === 0 ? endX : (current.type === 'group' ? (endX + this.#gapH + width / 2) : (endX + this.#gapH))
-        endX = current.type === 'group' ? (x + width / 2): x
+        x = index === 0 ? endX : current.type === 'group' ? endX + this.#gapH + width / 2 : endX + this.#gapH
+        endX = current.type === 'group' ? x + width / 2 : x
       }
 
       // 2. 排布定位
@@ -273,7 +310,7 @@ export class ArrangeGraph extends ArrangeEvent {
       //       return row.map((item, index, arr) => ({
       //         id: item.id,
       //         type: item.type,
-      //         parent: item.parent.id, 
+      //         parent: item.parent.id,
       //         rect: {
       //           x: index === arr.length - 1 ? (width - this.#gapH * index) / 2 + this.#gapH * index : this.#gapH * (index + 1),
       //           y: isOdd ? (this.#gapV + 72) * (rIndex - (rowArr.length - 1) / 2) : (this.#gapV + 72) * (rIndex - (rowArr.length - 1) / 2),
@@ -289,7 +326,7 @@ export class ArrangeGraph extends ArrangeEvent {
       //     rect: {x: pos[0], y: pos[1], width, height},
       //   })
       // }
-      
+
       if (current.prev) {
         const source = this.#getItemInstance(current.prev.id)
         const target = this.#getItemInstance(current.id)
@@ -324,7 +361,7 @@ export class ArrangeGraph extends ArrangeEvent {
       if (rt === false) {
         break
       }
-      index ++
+      index++
       current = current.next
     }
   }
@@ -332,36 +369,36 @@ export class ArrangeGraph extends ArrangeEvent {
   #toString() {
     let logId = ''
     // let logPos = ''
-    this.#forEachChain((current) => {
+    this.#forEachChain(current => {
       switch (current.type) {
-      case 'start':{
-        logId += `(${current.id})`
-        // logPos += `(${rect?.x})`
-        break
-      }
-      case 'single':{
-        logId += `[${current.id}]`
-        // logPos += `[${rect?.x}]`
-        break
-      }
-      case 'add':{
-        logId += `<${current.id.slice(4)}>`
-        // logPos += `<${rect?.x}>`
-        break
-      }
-      case 'group':{
-        logId += `{${current.id}}`
-        // logPos += `{${rect?.x}}`
-        break
-      }
-      case 'end':{
-        logId += `(${current.id})`
-        // logPos += `(${rect?.x})`
-        break
-      }
-          
-      default:
-        break
+        case 'start': {
+          logId += `(${current.id})`
+          // logPos += `(${rect?.x})`
+          break
+        }
+        case 'single': {
+          logId += `[${current.id}]`
+          // logPos += `[${rect?.x}]`
+          break
+        }
+        case 'add': {
+          logId += `<${current.id.slice(4)}>`
+          // logPos += `<${rect?.x}>`
+          break
+        }
+        case 'group': {
+          logId += `{${current.id}}`
+          // logPos += `{${rect?.x}}`
+          break
+        }
+        case 'end': {
+          logId += `(${current.id})`
+          // logPos += `(${rect?.x})`
+          break
+        }
+
+        default:
+          break
       }
       if (current.next) {
         logId += '->'
@@ -390,7 +427,7 @@ export class ArrangeGraph extends ArrangeEvent {
 
     let reLayout = false
     let endX: number
-    this.#forEachChain((current) => {
+    this.#forEachChain(current => {
       // if (!this. .has(current.id)) {
       //   return
       // }
@@ -417,13 +454,13 @@ export class ArrangeGraph extends ArrangeEvent {
           edge.target = next.id
           // 2.
           reLayout = true
-          const from = (this.#_itemsMap.get(prev.id) as (Node | Combo)).getRect()
+          const from = (this.#_itemsMap.get(prev.id) as Node | Combo).getRect()
           endX = from.x + from.width / 2
         }
         return
       }
       if (reLayout) {
-        const currentInstance = this.#_itemsMap.get(current.id) as (Node | Combo)
+        const currentInstance = this.#_itemsMap.get(current.id) as Node | Combo
         const rect = currentInstance.getRect()
         endX = endX + this.#gapH + rect.width
         currentInstance.posX(endX)
@@ -431,23 +468,23 @@ export class ArrangeGraph extends ArrangeEvent {
     })
   }
 
-  #findEdge(source: string, target: string): {id: string, source: string, target: string}|undefined {
+  #findEdge(source: string, target: string): { id: string; source: string; target: string } | undefined {
     const items = Array.from(this.#_itemsMap.values())
     const edges = items.filter(item => item.itemType === 'edge') as Edge[]
 
     for (const edge of this.#_itemsMap.values()) {
-      if(edge.source === source && edge.target === target) {
+      if (edge.source === source && edge.target === target) {
         return edge
       }
-    } 
+    }
   }
 
   // 根据位置, 尺寸生成 nodes 和 edges
   getItems() {
     const items = Array.from(this.#_itemsMap.values())
     return {
-      nodes: items.filter(item => item.itemType === 'node' || item.itemType === 'combo' ) as (Node | Combo)[],
-      edges: items.filter(item => item.itemType === 'edge' ) as Edge[],
+      nodes: items.filter(item => item.itemType === 'node' || item.itemType === 'combo') as (Node | Combo)[],
+      edges: items.filter(item => item.itemType === 'edge') as Edge[],
     }
   }
   #getItemInstance(id: string) {
@@ -466,4 +503,3 @@ export class ArrangeGraph extends ArrangeEvent {
     return this.#edgeMap.get(id)
   }
 }
-

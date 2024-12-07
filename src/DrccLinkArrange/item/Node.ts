@@ -1,14 +1,13 @@
-
 import { Group } from 'konva/lib/Group'
 import { Combo } from './Combo'
 import { IItemBase, ItemBase } from './Item'
 import { Arrange } from '..'
 
 export type NodeCfg = {
-  id: string,
-  combo?: Combo,
-  x?: number,
-  y?: number,
+  id: string
+  combo?: Combo
+  x?: number
+  y?: number
 }
 
 export interface INode extends IItemBase {
@@ -19,7 +18,7 @@ export interface INode extends IItemBase {
   posX(x: number): void
   pos(x: number, y: number): void
   relativePos(x: number, y: number): void
-  getRect(): {x: number, y: number, width: number, height: number}
+  getRect(): { x: number; y: number; width: number; height: number }
   afterAdd?(arrange: Arrange): void
   // nodeShape.tween = new Konva.Tween({
   //   node: nodeShape,
@@ -33,7 +32,7 @@ export interface INode extends IItemBase {
 export class Node extends ItemBase implements INode {
   itemType = 'node' as const
   rootShape?: Group
-  combo?: Combo 
+  combo?: Combo
 
   constructor(cfg: NodeCfg) {
     super(cfg.id)
@@ -63,9 +62,8 @@ export class Node extends ItemBase implements INode {
   }
 
   getRect() {
-    return {x: 0, y: 0, width: 0, height: 0}
+    return { x: 0, y: 0, width: 0, height: 0 }
   }
 
   afterAdd(arrange: Arrange) {}
-
 }

@@ -4,28 +4,28 @@ interface IBaseEvent {
    * @param type 事件类型
    * @param handler 事件回调
    */
-  on(type: string, handler: (e:any) => void) :void;
+  on(type: string, handler: (e: any) => void): void
   /**
    * 移除事件监听函数
    * @param type 事件类型
    * @param handler 监听函数
    */
-  off(type: string, handler?: (e:any) => void) :void;
+  off(type: string, handler?: (e: any) => void): void
   /**
    * 触发事件
    * @param type 事件类型
    * @param payload 事件参数
    */
-  emit(type: string, payload?: any): void;
+  emit(type: string, payload?: any): void
 }
 
 export default class BaseEvent implements IBaseEvent {
-  #_handlerMap: Map<string, Set<((e: any) => void)>> = new Map()
+  #_handlerMap: Map<string, Set<(e: any) => void>> = new Map()
 
   emit(type: string, payload?: any) {
     const handlers = this.#_handlerMap.get(type)
     if (handlers && handlers.size > 0) {
-      handlers.forEach(handler => handler({target:this, payload}))
+      handlers.forEach(handler => handler({ target: this, payload }))
     }
   }
 
@@ -48,7 +48,7 @@ export default class BaseEvent implements IBaseEvent {
       return
     }
     const handlers = this.#_handlerMap.get(type)
-    if(!handlers || !handlers.size) return
+    if (!handlers || !handlers.size) return
 
     if (!handler) {
       handlers.clear()
@@ -62,5 +62,4 @@ export default class BaseEvent implements IBaseEvent {
       this.#_handlerMap.delete(type)
     }
   }
-
 }

@@ -15,15 +15,17 @@ export class ComboNormal extends Combo {
     this._rows = cfg.rows
   }
 
-  getSize()  {
+  getSize() {
     const rows = this._rows.length
     const maxCols = Math.max(...this._rows.map(row => row.length))
-    return [(maxCols + 1) * this.#gapH, rows *  72 + (rows - 1) * this.#gapV] as const
+    return [(maxCols + 1) * this.#gapH, rows * 72 + (rows - 1) * this.#gapV] as const
   }
 
   draw(): Group {
     const [width, height] = this.getSize()
-    const id = this.id, rect = {width, height, x: this.x, y: this.y}, rows = this.rows
+    const id = this.id,
+      rect = { width, height, x: this.x, y: this.y },
+      rows = this.rows
 
     const group = new Konva.Group({
       id: `node-${id}-group`,
@@ -52,7 +54,7 @@ export class ComboNormal extends Combo {
         height: rect.height,
         draggable: false,
         listening: false,
-        stroke: 'red'
+        stroke: 'red',
       })
       group.add(border)
     }
@@ -100,39 +102,36 @@ export class ComboNormal extends Combo {
     rows.forEach(row => {
       row.forEach(item => {
         switch (item.type) {
-        case 'groupAdd': {
-          const nodeInstance = new NodeAdd({
-            id: item.id,
-            x: item.rect.x,
-            y: item.rect.y + rect.height / 2,
-            combo: this,
-          })
-          this.itemMap.set(item.id, nodeInstance)
-          group.add(nodeInstance.group)
-          break
-        }
-        case 'groupSingle': {
-          const nodeInstance = new NodeNormal({
-            id: item.id,
-            x: item.rect.x,
-            y: item.rect.y + rect.height / 2,
-            label: item.id,
-            combo: this,
-          })
-          this.itemMap.set(item.id, nodeInstance)
-          
-          group.add(nodeInstance.group)
-          break
-        }
+          case 'groupAdd': {
+            const nodeInstance = new NodeAdd({
+              id: item.id,
+              x: item.rect.x,
+              y: item.rect.y + rect.height / 2,
+              combo: this,
+            })
+            this.itemMap.set(item.id, nodeInstance)
+            group.add(nodeInstance.group)
+            break
+          }
+          case 'groupSingle': {
+            const nodeInstance = new NodeNormal({
+              id: item.id,
+              x: item.rect.x,
+              y: item.rect.y + rect.height / 2,
+              label: item.id,
+              combo: this,
+            })
+            this.itemMap.set(item.id, nodeInstance)
+
+            group.add(nodeInstance.group)
+            break
+          }
         }
       })
     })
- 
 
     return group
   }
 
-  update(): void {
-
-  }
+  update(): void {}
 }

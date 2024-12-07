@@ -1,7 +1,7 @@
 import NodeUtils from './NodeUtils'
 import type { AbstractNode, ClientRect, MarginRect, Pos } from './type'
 
-export default class SingleNode extends NodeUtils implements AbstractNode  {
+export default class SingleNode extends NodeUtils implements AbstractNode {
   _id: string
   _anchorX: number = 0
   _anchorY: number = 0
@@ -18,15 +18,15 @@ export default class SingleNode extends NodeUtils implements AbstractNode  {
   _getRealPos(): [number, number] {
     return [this._anchorX - this._anchor[0], this._anchorY - this._anchor[1]]
   }
-  
-  constructor(options: {id:string, icon:string, text: string, name: string}) {
+
+  constructor(options: { id: string; icon: string; text: string; name: string }) {
     super()
     this._id = options.id
     this._text = options.text
     this._name = options.name
     const icon = new Image()
     icon.src = options.icon
-    
+
     icon.onload = () => {
       // 模拟图片加载
       setTimeout(() => {
@@ -56,17 +56,17 @@ export default class SingleNode extends NodeUtils implements AbstractNode  {
   }
 
   getClientRect(): ClientRect {
-    const [x, y] =  this._getRealPos()
-    return {width: this._w, height: this._h, left: x, top: y, x: this._anchorX, y: this._anchorY}
+    const [x, y] = this._getRealPos()
+    return { width: this._w, height: this._h, left: x, top: y, x: this._anchorX, y: this._anchorY }
   }
 
   getMarginRect(): MarginRect {
-    const [x, y] =  this._getRealPos()
+    const [x, y] = this._getRealPos()
     return {
       width: this._w,
       height: this._h + 20, // text height
       left: x,
-      top: y
+      top: y,
     }
   }
 

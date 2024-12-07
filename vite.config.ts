@@ -12,7 +12,7 @@ export default defineConfig({
     react(),
     UnoCSS(
       {
-        mode: 'per-module'
+        mode: 'per-module',
       }
       // {
       //   presets: [], // don't use preset
@@ -24,6 +24,6 @@ export default defineConfig({
       //     ['flex', { display: 'flex' }],
       //   ]
       // }
-    )
+    ),
   ],
 })

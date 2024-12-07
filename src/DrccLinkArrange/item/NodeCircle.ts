@@ -8,7 +8,7 @@ type NodeCircleCfg = NodeCfg & { label?: string }
 export class NodeCircle extends Node {
   type = 'circle'
   size = 48
-  label = '' 
+  label = ''
 
   constructor(cfg: NodeCircleCfg) {
     super(cfg)
@@ -28,7 +28,12 @@ export class NodeCircle extends Node {
     }
   }
   draw(): Group {
-    const id = this.id, size = this.size, x = this.x, y = this.y, borderWidth = 2, label = this.label
+    const id = this.id,
+      size = this.size,
+      x = this.x,
+      y = this.y,
+      borderWidth = 2,
+      label = this.label
 
     const group = new Konva.Group({
       id: `node-${id}-group`,
@@ -43,7 +48,7 @@ export class NodeCircle extends Node {
       },
       draggable: false,
     })
-  
+
     const circle = new Konva.Circle({
       id: `node-${id}-circle`,
       x: size / 2,
@@ -82,7 +87,7 @@ export class NodeCircle extends Node {
   }
   #eventBind(arrange: Arrange) {
     const group = this.rootShape
-    if(!group) return
+    if (!group) return
 
     group.on('mouseenter', () => {
       arrange.config.container.style.cursor = 'pointer'
@@ -116,7 +121,5 @@ export class NodeCircle extends Node {
       })
     })
   }
-  update(): void {
-
-  }
+  update(): void {}
 }

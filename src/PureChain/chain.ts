@@ -1,4 +1,4 @@
-type NItem = {id: string; type?: string, data?: any}
+type NItem = { id: string; type?: string; data?: any }
 type GItem = NItem[][]
 type InputItem = NItem | GItem
 type InputItems = InputItem[]
@@ -7,27 +7,30 @@ function isGItem(item: InputItem): item is GItem {
 }
 
 const nodes: InputItems = [
-  {id: 'start', type: 'circle', data: {}},
-  {id: 'a', type: 'single', data: {}},
-  {id: 'b', type: 'double', data: {}},
+  { id: 'start', type: 'circle', data: {} },
+  { id: 'a', type: 'single', data: {} },
+  { id: 'b', type: 'double', data: {} },
   [
-    [{id: 'c1', type: 'single', data: {}}, {id: 'c2', type: 'double', data: {}}],
-    [{id: 'c3', type: 'single', data: {}}]
+    [
+      { id: 'c1', type: 'single', data: {} },
+      { id: 'c2', type: 'double', data: {} },
+    ],
+    [{ id: 'c3', type: 'single', data: {} }],
   ],
-  {id: 'end', type: 'circle', data: {}},
+  { id: 'end', type: 'circle', data: {} },
 ]
 
 // 内部使用
-type Shape = { x: number, y: number, width: number, height: number}
-type InnerNItem = {id: string; type: string, shape: Shape, data: Record<string, any>}
-type InnerGItem = {id: string; type: 'group', shape: Shape, data: Record<string, any>, rows: InnerNItem[][]}
+type Shape = { x: number; y: number; width: number; height: number }
+type InnerNItem = { id: string; type: string; shape: Shape; data: Record<string, any> }
+type InnerGItem = { id: string; type: 'group'; shape: Shape; data: Record<string, any>; rows: InnerNItem[][] }
 type InnerItem = InnerNItem | InnerGItem
 type InnerItems = InnerItem[]
 function isInnerGItem(item: InnerItem): item is InnerGItem {
   return item.type === 'group'
 }
 
-const INIT_SHAPE = { x: 0, y: 0, width: 20, height: 20}
+const INIT_SHAPE = { x: 0, y: 0, width: 20, height: 20 }
 function initNodes(nodes: InputItems): InnerItems {
   let gIndex = 0
   return nodes.map(item => {
@@ -36,11 +39,18 @@ function initNodes(nodes: InputItems): InnerItems {
         id: `group${gIndex++}`,
         type: 'group',
         data: {},
-        shape: {...INIT_SHAPE},
-        rows: item.map(rItem => rItem.map(cItem => ({id: cItem.id, type: cItem.type || 'single', shape: {...INIT_SHAPE}, data: {...cItem.data}})))
+        shape: { ...INIT_SHAPE },
+        rows: item.map(rItem =>
+          rItem.map(cItem => ({
+            id: cItem.id,
+            type: cItem.type || 'single',
+            shape: { ...INIT_SHAPE },
+            data: { ...cItem.data },
+          }))
+        ),
       }
     } else {
-      return {id: item.id, type: item.type || 'single', shape: {...INIT_SHAPE}, data: {...item.data}}
+      return { id: item.id, type: item.type || 'single', shape: { ...INIT_SHAPE }, data: { ...item.data } }
     }
   })
 }
@@ -49,7 +59,9 @@ function insertEach(nodes: InnerItems, item: () => InnerNItem): InnerItems {
   function insertInnerGItem(cItem: InnerGItem): InnerGItem {
     return {
       ...cItem,
-      rows: cItem.rows.map((row) => row.flatMap((node, index) => index === 0 ? [item(), node, item()] : [node, item()]))
+      rows: cItem.rows.map(row =>
+        row.flatMap((node, index) => (index === 0 ? [item(), node, item()] : [node, item()]))
+      ),
     }
   }
   return nodes.flatMap((node, index, arr) => {
@@ -61,8 +73,7 @@ function insertEach(nodes: InnerItems, item: () => InnerNItem): InnerItems {
   })
 }
 
-
-type LayoutCfg = { startX: number, startY: number, gapH: number, gapV: number}
+type LayoutCfg = { startX: number; startY: number; gapH: number; gapV: number }
 function layoutChain(nodes: InnerItems, cfg: LayoutCfg) {
   let lastX = cfg.startX
 
@@ -75,7 +86,7 @@ function layoutChain(nodes: InnerItems, cfg: LayoutCfg) {
       const pointTopLeft = [lastX + cfg.gapH / 2, cfg.startY - cfg.gapV / 2]
       cNode.rows.forEach((row, rowIndex) => {
         const rowY = pointTopLeft[1] + rowIndex * cfg.gapV
-        
+
         // 居中对齐
         // const rowSize = row.length
         // if (rowSize === 1) {
@@ -94,8 +105,8 @@ function layoutChain(nodes: InnerItems, cfg: LayoutCfg) {
         row.forEach((node, nodeIndex) => {
           node.shape.x = pointTopLeft[0] + cfg.gapH / 2 + nodeIndex * cfg.gapH
           node.shape.y = rowY
-          node.shape.width = {circle: 50, single: 72, double: 90, add: 32}[node.type ?? 'single'] || 20
-          node.shape.height = {circle: 50, single: 72, double: 72, add: 32}[node.type ?? 'single'] || 20
+          node.shape.width = { circle: 50, single: 72, double: 90, add: 32 }[node.type ?? 'single'] || 20
+          node.shape.height = { circle: 50, single: 72, double: 72, add: 32 }[node.type ?? 'single'] || 20
         })
       })
 
@@ -108,8 +119,8 @@ function layoutChain(nodes: InnerItems, cfg: LayoutCfg) {
       const node = item
       node.shape.x = lastX + cfg.gapH
       node.shape.y = cfg.startY
-      node.shape.width = {circle: 50, single: 72, double: 90, add: 32}[node.type ?? 'single'] || 20
-      node.shape.height = {circle: 50, single: 72, double: 72, add: 32}[node.type ?? 'single'] || 20
+      node.shape.width = { circle: 50, single: 72, double: 90, add: 32 }[node.type ?? 'single'] || 20
+      node.shape.height = { circle: 50, single: 72, double: 72, add: 32 }[node.type ?? 'single'] || 20
       lastX = node.shape.x
     }
   })
@@ -124,8 +135,8 @@ function genEdge(nodes: InnerItems): [number, number, number, number][] {
     if (!next) return
 
     if (isInnerGItem(node)) {
-      const shape = node.shape 
-      const x = [shape.x - shape.width / 2,  shape.x + shape.width / 2]
+      const shape = node.shape
+      const x = [shape.x - shape.width / 2, shape.x + shape.width / 2]
       const y = [shape.y - shape.height / 2, shape.y + shape.height / 2]
 
       edges.push([x[0], y[0], x[0], y[1]])
@@ -147,14 +158,12 @@ function genEdge(nodes: InnerItems): [number, number, number, number][] {
           }
         })
       })
-      
     } else {
       edges.push([node.shape.x + node.shape.width / 2, node.shape.y, next.shape.x - next.shape.width / 2, next.shape.y])
     }
   })
   return edges
 }
-
 
 let refresh = true
 function render() {
@@ -164,7 +173,7 @@ function render() {
   console.log('innerNodes', innerNodes)
 
   let insertIndex = 0
-  const getInsertItem = () => ({id: `add${insertIndex++}`, type: 'add', shape: {...INIT_SHAPE}, data: {}})
+  const getInsertItem = () => ({ id: `add${insertIndex++}`, type: 'add', shape: { ...INIT_SHAPE }, data: {} })
   const insertedNodes = insertEach(innerNodes, getInsertItem)
   console.log('insertedNodes', insertedNodes)
 
@@ -182,19 +191,18 @@ function render() {
 //     refresh = false
 //   }
 // }, 30)
- 
 
 /**
  *  只用来表示节点的连接关系, 不关心布局
- * 
- * 
+ *
+ *
  */
 class DoublyLinkedList {
   head: LinkedListNode
   tail: LinkedListNode
   length: number = 0
 
-  constructor(list:(string | (string | string[])[])[]) {
+  constructor(list: (string | (string | string[])[])[]) {
     if (list.length === 0) throw Error('DoublyLinkedList.list > 0')
     this.length = list.length
 
@@ -212,11 +220,11 @@ class DoublyLinkedList {
     }
 
     if (list.length > 2) {
-      let prev: LinkedListNode|LinkedListParallel = this.head
+      let prev: LinkedListNode | LinkedListParallel = this.head
       list.forEach((item, index, arr) => {
         if (index !== 0 && index !== arr.length - 1) {
           //
-          let nodeItem: LinkedListNode|LinkedListParallel
+          let nodeItem: LinkedListNode | LinkedListParallel
           if (typeof item === 'string') {
             nodeItem = new LinkedListNode(item)
           } else {
@@ -240,7 +248,7 @@ class DoublyLinkedList {
 
   forwardString() {
     let str = this.head.item
-    let next: LinkedListNode|LinkedListParallel|null = this.head.next
+    let next: LinkedListNode | LinkedListParallel | null = this.head.next
     while (next) {
       if (next instanceof LinkedListNode) {
         str += `===>${next.toString()}`
@@ -254,7 +262,7 @@ class DoublyLinkedList {
 
   backwardString() {
     let str = this.tail.item
-    let prev: LinkedListNode|LinkedListParallel|null = this.tail.prev
+    let prev: LinkedListNode | LinkedListParallel | null = this.tail.prev
     while (prev) {
       if (prev instanceof LinkedListNode) {
         str += `===>${prev.toString()}`
@@ -269,7 +277,7 @@ class DoublyLinkedList {
   /** size 和 length 不同, length仅表示长度, 一个并行节点只算一个长度, size则统计了并行中的子节点数量 */
   size() {
     let count = 0
-    let next: LinkedListNode|LinkedListParallel|null = this.head
+    let next: LinkedListNode | LinkedListParallel | null = this.head
     while (next) {
       count += next.size()
       next = next.next
@@ -278,14 +286,12 @@ class DoublyLinkedList {
   }
 }
 
-
-
 /** A */
 class SimpleNode {
-  prev: SimpleNode|null = null
+  prev: SimpleNode | null = null
   item: string
-  next: SimpleNode|null = null
-  constructor(item: string, prev: SimpleNode|null = null, next: SimpleNode|null = null) {
+  next: SimpleNode | null = null
+  constructor(item: string, prev: SimpleNode | null = null, next: SimpleNode | null = null) {
     this.item = item
     this.prev = prev
     this.next = next
@@ -294,8 +300,8 @@ class SimpleNode {
 
 /** 简单的串联链路 -A- */
 class SimpleList {
-  head: SimpleNode|null
-  tail: SimpleNode|null
+  head: SimpleNode | null
+  tail: SimpleNode | null
   length: number = 0
 
   constructor(list: string[]) {
@@ -331,7 +337,7 @@ class SimpleList {
     if (!this.head) return ''
     let str = this.head.item
     let next: SimpleNode | null = this.head.next
- 
+
     while (next) {
       str += `->${next.item}`
       next = next.next
@@ -343,7 +349,7 @@ class SimpleList {
     if (!this.tail) return ''
     let str = this.tail.item
     let prev: SimpleNode | null = this.tail.prev
- 
+
     while (prev) {
       str += `->${prev.item}`
       prev = prev.prev
@@ -404,10 +410,14 @@ class SimpleList {
  *  --B--   -B-C-
  */
 class LinkedListParallel {
-  prev : LinkedListNode|LinkedListParallel|null
-  item : SimpleList[]
-  next : LinkedListNode|LinkedListParallel|null
-  constructor(parallel: SimpleList[], prev: LinkedListNode|LinkedListParallel|null = null, next: LinkedListNode|LinkedListParallel|null = null) {
+  prev: LinkedListNode | LinkedListParallel | null
+  item: SimpleList[]
+  next: LinkedListNode | LinkedListParallel | null
+  constructor(
+    parallel: SimpleList[],
+    prev: LinkedListNode | LinkedListParallel | null = null,
+    next: LinkedListNode | LinkedListParallel | null = null
+  ) {
     this.item = parallel
     this.prev = prev
     this.next = next
@@ -422,15 +432,19 @@ class LinkedListParallel {
   }
 
   size() {
-    return this.item.reduce((result, simpleList) => result + simpleList.size(), 0 )
+    return this.item.reduce((result, simpleList) => result + simpleList.size(), 0)
   }
 }
 
 class LinkedListNode {
-  prev: LinkedListNode|LinkedListParallel|null = null
+  prev: LinkedListNode | LinkedListParallel | null = null
   item: string
-  next: LinkedListNode|LinkedListParallel|null = null
-  constructor(item: string, prev: LinkedListNode|LinkedListParallel|null = null, next: LinkedListNode|LinkedListParallel|null = null) {
+  next: LinkedListNode | LinkedListParallel | null = null
+  constructor(
+    item: string,
+    prev: LinkedListNode | LinkedListParallel | null = null,
+    next: LinkedListNode | LinkedListParallel | null = null
+  ) {
     this.item = item
     this.prev = prev
     this.next = next
@@ -444,7 +458,7 @@ class LinkedListNode {
 }
 
 /**
- * SimpleNode => SimpleList => LinkedListParallel    
+ * SimpleNode => SimpleList => LinkedListParallel
  *                                                 => LinkedList
  *                                 LinkedListItem
  * todo: https://juejin.cn/post/6930978110993072135

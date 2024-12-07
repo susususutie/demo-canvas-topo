@@ -6,14 +6,14 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import hooksPlugin from 'eslint-plugin-react-hooks'
 
 const myJsTsRules = {
-  'indent': ['error', 2],
+  indent: ['error', 2],
   'arrow-body-style': ['warn', 'as-needed'],
   // 不加`;` 除非 `;(function() { ... })()`
-  'semi': ['warn', 'never', { 'beforeStatementContinuationChars': 'always' }],
-  'quotes': ['warn', 'single'],
+  semi: ['warn', 'never', { beforeStatementContinuationChars: 'always' }],
+  quotes: ['warn', 'single'],
   'no-unused-vars': 'warn',
   'comma-spacing': 'warn',
-  'comma-dangle': ['warn', 'only-multiline']
+  'comma-dangle': ['warn', 'only-multiline'],
 }
 
 export default [
@@ -22,16 +22,16 @@ export default [
     languageOptions: {
       parser: tsParser,
       globals: {
-        ...globals.browser
-      }
+        ...globals.browser,
+      },
     },
     plugins: {
       'react-refresh': reactRefresh,
       'react-hooks': hooksPlugin,
-      '@typescript-eslint': ts
+      '@typescript-eslint': ts,
     },
     rules: {
-      'react-refresh/only-export-components': ['warn', {allowConstantExport: true }],
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'error',
       ...js.configs.recommended.rules,
@@ -46,8 +46,8 @@ export default [
     files: ['eslint.config.js'],
     rules: {
       ...js.configs.recommended.rules,
-      ...myJsTsRules
-    }
+      ...myJsTsRules,
+    },
   },
   {
     files: ['vite.config.ts'],
@@ -61,7 +61,6 @@ export default [
       //此处禁用了eslint的`no-loss-of-precision`与`no-unused-vars`rules, 增加了一些`@typescript-eslint`开头的rules
       ...ts.configs['recommended'].rules,
       ...myJsTsRules,
-    }
+    },
   },
 ]
- 

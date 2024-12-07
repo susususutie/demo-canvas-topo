@@ -1,4 +1,4 @@
-import Konva from 'konva' 
+import Konva from 'konva'
 import { Edge, EdgeCfg } from './Edge'
 import { IItemBase } from './Item'
 import { Line } from 'konva/lib/shapes/Line'
@@ -67,7 +67,5 @@ export class EdgeLine extends Edge {
         canvasY: ev.evt.clientY,
       })
     })
-
-
   }
 }

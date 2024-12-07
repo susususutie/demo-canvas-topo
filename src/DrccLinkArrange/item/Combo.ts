@@ -3,30 +3,30 @@ import { IItemBase, ItemBase } from './Item'
 import { Node } from './Node'
 
 export type ComboCfg = {
-  id: string,
-  x?: number,
-  y?: number,
-  rows: {id: string; type: 'groupSingle' | 'groupAdd'}[][],
+  id: string
+  x?: number
+  y?: number
+  rows: { id: string; type: 'groupSingle' | 'groupAdd' }[][]
 }
 
 export interface ICombo extends IItemBase {
   itemType: 'combo'
   rootShape?: Group
-  rows: {id: string; type: 'groupSingle' | 'groupAdd'}[][]
+  rows: { id: string; type: 'groupSingle' | 'groupAdd' }[][]
   itemMap: Map<string, Node>
   getSize(): readonly [number, number]
   posX(x: number): void
-  getRect(): {x: number, y: number, width: number, height: number}
+  getRect(): { x: number; y: number; width: number; height: number }
   afterAdd?(): void
 }
 
 export class Combo extends ItemBase implements ICombo {
   itemType = 'combo' as const
   rootShape?: Group
-  rows: {id: string; type: 'groupSingle' | 'groupAdd'}[][]
+  rows: { id: string; type: 'groupSingle' | 'groupAdd' }[][]
   itemMap = new Map<string, Node>()
 
-  constructor( cfg: ComboCfg) {
+  constructor(cfg: ComboCfg) {
     super(cfg.id)
     this.x = cfg.x ?? 0
     this.y = cfg.y ?? 0

@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 
-type Pos = {x:number, y:number}
-type ClientRect = {width:number, height:number, left:number, top:number, x: number, y:number}
-type MarginRect = {width:number, height:number, left:number, top:number}
+type Pos = { x: number; y: number }
+type ClientRect = { width: number; height: number; left: number; top: number; x: number; y: number }
+type MarginRect = { width: number; height: number; left: number; top: number }
 
 export interface AbstractNode {
-  getId() : string
+  getId(): string
   getStatus(): 'IDLE' | 'READY'
   setPos(pos: Partial<Pos>): void
   getClientRect(): ClientRect
@@ -14,6 +14,6 @@ export interface AbstractNode {
 }
 
 interface PainterData {
-  nodes: {id: string, type:'single', icon:string, text:string, name: string}[],
-  links: {source:string;target:string}[] 
+  nodes: { id: string; type: 'single'; icon: string; text: string; name: string }[]
+  links: { source: string; target: string }[]
 }

@@ -6,24 +6,24 @@ import { PainterData } from './type'
 export default class Painter extends BaseEvent {
   _previewCanvas: HTMLCanvasElement
   _previewContext: CanvasRenderingContext2D
-  _nodes: (SingleNode|CircleNode)[] = []
+  _nodes: (SingleNode | CircleNode)[] = []
   _links: string[] = []
   _isReady: boolean = false
   _background = '#fff'
 
-  _parseLinks(links: {source:string;target:string}[]): string[] {
-    let source: string|null = links[0].source
-    let target: string|null = links[0].target
+  _parseLinks(links: { source: string; target: string }[]): string[] {
+    let source: string | null = links[0].source
+    let target: string | null = links[0].target
     const sortList = [source, target]
     while (source || target) {
-      const beforeItem = links.find((i) => i.target === source)
+      const beforeItem = links.find(i => i.target === source)
       if (beforeItem) {
         source = beforeItem.source
         sortList.unshift(beforeItem.source)
       } else {
         source = null
       }
-      const nextItem = links.find((i) => i.source === target)
+      const nextItem = links.find(i => i.source === target)
       if (nextItem) {
         target = nextItem.target
         sortList.push(nextItem.target)
@@ -40,7 +40,7 @@ export default class Painter extends BaseEvent {
       layoutY = canvasHeight * 0.5
     const gapH = 88
     this._links.forEach((id, index) => {
-      const node = this._nodes.find((node) => node.getId() === id)
+      const node = this._nodes.find(node => node.getId() === id)
       if (!node) return
 
       const { width, height } = node.getClientRect()
@@ -50,7 +50,7 @@ export default class Painter extends BaseEvent {
       }
 
       layoutX += width * 0.5 + (index !== 0 ? gapH : 0)
-      node.setPos({x:layoutX, y:layoutY})
+      node.setPos({ x: layoutX, y: layoutY })
       layoutX += width * 0.5
     })
     if (layoutX > this._previewCanvas.width) {
@@ -63,20 +63,21 @@ export default class Painter extends BaseEvent {
     this._previewContext.fillStyle = this._background
     this._previewContext.fillRect(0, 0, this._previewCanvas.width, this._previewCanvas.height)
     const nodeIdRectMap = new Map<string, [number, number]>()
-    this._nodes.forEach((node) => {
+    this._nodes.forEach(node => {
       const id = node.getId()
-      const {x, y} = node.getClientRect()
+      const { x, y } = node.getClientRect()
       nodeIdRectMap.set(id, [x, y])
     })
     this._links.forEach((nodeId, index, arr) => {
-      if (index===0) return
+      if (index === 0) return
       const [prevX, prevY] = nodeIdRectMap.get(arr[index - 1])!
       const [x, y] = nodeIdRectMap.get(nodeId)!
       this._drawLine(prevX, prevY, x, y)
     })
-    this._nodes.forEach((node) => node.draw(this._previewContext))
+    this._nodes.forEach(node => node.draw(this._previewContext))
+    console.log('draw')
   }
-  _drawLine(x1:number, y1:number, x2:number, y2:number) {
+  _drawLine(x1: number, y1: number, x2: number, y2: number) {
     this._previewContext.save()
     this._previewContext.strokeStyle = '#3385FF'
     this._previewContext.lineWidth = 1
@@ -88,14 +89,16 @@ export default class Painter extends BaseEvent {
   _initData(data: PainterData) {
     const { nodes: nodeConfigs = [], links: linkConfigs = [] } = data
 
-    const nodes = nodeConfigs.map((_cfg) => {
-      const { type, ...cfg } = _cfg
-      if (type === 'single') {
-        const node = new SingleNode(cfg)
-        node.on('update', this._updateNode.bind(this))
-        return node
-      }
-    }).filter(Boolean) as SingleNode[]
+    const nodes = nodeConfigs
+      .map(_cfg => {
+        const { type, ...cfg } = _cfg
+        if (type === 'single') {
+          const node = new SingleNode(cfg)
+          node.on('update', this._updateNode.bind(this))
+          return node
+        }
+      })
+      .filter(Boolean) as SingleNode[]
 
     const sortNodeIds = this._parseLinks(linkConfigs)
 
@@ -109,19 +112,21 @@ export default class Painter extends BaseEvent {
   }
   _timer: number = 0
   _updateNode() {
-    clearTimeout(this._timer)
-    this._timer = setTimeout(() => {
+    cancelAnimationFrame(this._timer)
+    this._timer = requestAnimationFrame(() => {
       this._draw()
       const idleNodes = this._nodes.filter(node => node.getStatus() !== 'READY')
       if (idleNodes.length === 0) {
         this._isReady = true
         this.emit('ready')
       }
-    }, 80)
-    
+    })
   }
   _getMarginRect() {
-    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity
+    let x0 = Infinity,
+      y0 = Infinity,
+      x1 = -Infinity,
+      y1 = -Infinity
     this._nodes.forEach(node => {
       const rect = node.getMarginRect()
       x0 = Math.min(x0, rect.left)
@@ -129,7 +134,7 @@ export default class Painter extends BaseEvent {
       x1 = Math.max(x1, rect.left + rect.width)
       y1 = Math.max(y1, rect.top + rect.height)
     })
-    return {x: x0, y: y0, width: x1-x0, height: y1-y0}
+    return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 }
   }
   _genImgWithPadding() {
     const padding = [10, 20, 30, 40]
@@ -159,10 +164,10 @@ export default class Painter extends BaseEvent {
   }
 
   async toPng() {
-    if (this._isReady){
+    if (this._isReady) {
       return this._genImgWithPadding()
     } else {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         this.on('ready', () => {
           resolve(this._genImgWithPadding())
         })
@@ -170,3 +175,15 @@ export default class Painter extends BaseEvent {
     }
   }
 }
+
+const obj = {
+  a: 1,
+  b: 2,
+  c: 3,
+}
+
+const list = [
+  1, //
+  2,
+  3,
+]

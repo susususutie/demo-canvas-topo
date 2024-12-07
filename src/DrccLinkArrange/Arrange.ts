@@ -19,26 +19,26 @@ import { Combo } from './item/Combo'
 //   [Prop in keyof T as `${T[Prop]}`]: Prop
 // }
 
-type MinimapConfig = {container: HTMLDivElement, scale?: number }
+type MinimapConfig = { container: HTMLDivElement; scale?: number }
 type Cfg = {
-  container: HTMLDivElement,
-  minimap?: MinimapConfig | false,
-  width: number,
-  height: number,
-  background?: string,
-  grid?: boolean,
-  zoom?: boolean,
-  maxZoom?: number,
-  minZoom?: number,
-  pan?: boolean,
-  autoResize?: boolean,
-  dev?: boolean,
+  container: HTMLDivElement
+  minimap?: MinimapConfig | false
+  width: number
+  height: number
+  background?: string
+  grid?: boolean
+  zoom?: boolean
+  maxZoom?: number
+  minZoom?: number
+  pan?: boolean
+  autoResize?: boolean
+  dev?: boolean
   layout?: LayoutItem[]
 }
 type Config = Cfg & {
-  maxZoom: number,
-  minZoom: number,
-  pan: boolean,
+  maxZoom: number
+  minZoom: number
+  pan: boolean
 }
 
 export default class Arrange extends ArrangeGraph {
@@ -47,7 +47,7 @@ export default class Arrange extends ArrangeGraph {
   private _width: number
   private _height: number
   /** 内部元素(node, edge)布局占用的尺寸 */
-  contentRect = {x: 0, y: 0, width: 0, height: 0}
+  contentRect = { x: 0, y: 0, width: 0, height: 0 }
   config: Config
   _stage: Stage
   private _layer: Layer
@@ -59,41 +59,43 @@ export default class Arrange extends ArrangeGraph {
   private _background?: Rect
   /** grid */
   private _grid?: Group
-  private _gridLastPosition = {x:0, y:0}
+  private _gridLastPosition = { x: 0, y: 0 }
   private _gridConfig = {
-    fromX : 0,
-    toX : 0,
-    fromY : 0,
-    toY : 0,
-    gapH : 100,
-    gapV : 100,
-    strokeWidth : 1,
-    stroke : '#ddd',
-    dash : undefined,
+    fromX: 0,
+    toX: 0,
+    fromY: 0,
+    toY: 0,
+    gapH: 100,
+    gapV: 100,
+    strokeWidth: 1,
+    stroke: '#ddd',
+    dash: undefined,
   }
   private _resizeObserver: ResizeObserver | null = null
 
-  _pushContentRect(childrenRect: {x: number, y: number, width: number, height: number}) {
+  _pushContentRect(childrenRect: { x: number; y: number; width: number; height: number }) {
     const x = this.contentRect.x
     const y = this.contentRect.y
     this.contentRect.x = Math.min(x, childrenRect.x)
     this.contentRect.y = Math.min(y, childrenRect.y)
-    this.contentRect.width = Math.max(x + this.contentRect.width, childrenRect.x + childrenRect.width) - this.contentRect.x
-    this.contentRect.height = Math.max(y + this.contentRect.height, childrenRect.y + childrenRect.height) - this.contentRect.y
+    this.contentRect.width =
+      Math.max(x + this.contentRect.width, childrenRect.x + childrenRect.width) - this.contentRect.x
+    this.contentRect.height =
+      Math.max(y + this.contentRect.height, childrenRect.y + childrenRect.height) - this.contentRect.y
   }
 
   constructor(cfg: Cfg) {
-    super({layout: cfg.layout || [], showAdd: true})
+    super({ layout: cfg.layout || [], showAdd: true })
 
     this._width = cfg.width
     this._height = cfg.height
 
-    const {nodes} = this.getItems()
+    const { nodes } = this.getItems()
 
     this.contentRect.x = nodes?.[0].getRect().x ?? 0
     this.contentRect.y = nodes?.[0].getRect().y ?? 0
 
-    this.config = {...cfg, pan: !!cfg?.pan,  minZoom: cfg?.minZoom ?? 0.5, maxZoom: cfg?.maxZoom ?? 2}
+    this.config = { ...cfg, pan: !!cfg?.pan, minZoom: cfg?.minZoom ?? 0.5, maxZoom: cfg?.maxZoom ?? 2 }
 
     this._stage = new Konva.Stage({
       container: cfg.container,
@@ -113,19 +115,19 @@ export default class Arrange extends ArrangeGraph {
       this.#paintGrid()
     }
     if (this.config.pan) {
-      this._stage.on('mouseover', (ev) => {
+      this._stage.on('mouseover', ev => {
         if (ev.target !== this._stage) {
           return
         }
         this.config.container.style.cursor = 'grab'
       })
-      this._stage.on('mousedown', (ev) => {
+      this._stage.on('mousedown', ev => {
         if (ev.target !== this._stage) {
           return
         }
         this.config.container.style.cursor = 'grabbing'
       })
-      this._stage.on('mouseup', (ev) => {
+      this._stage.on('mouseup', ev => {
         if (ev.target !== this._stage) {
           return
         }
@@ -136,14 +138,14 @@ export default class Arrange extends ArrangeGraph {
       })
       // this.#stage.on('dragstart', (ev) => {
       // })
-      this._stage.on('dragmove', (ev) => {
+      this._stage.on('dragmove', ev => {
         if (ev.target !== this._stage) {
           return
         }
         if (this._background) {
           this._background.absolutePosition({ x: 0, y: 0 })
         }
-  
+
         // 拖动画布时, grid位置不变(一直重置为之前的位置), 尺寸变化(动态更改points)
         if (this._grid) {
           this._grid.absolutePosition(this._gridLastPosition)
@@ -153,17 +155,17 @@ export default class Arrange extends ArrangeGraph {
       })
     }
     if (this.config?.zoom) {
-      this._stage.on('wheel', (e) => {
+      this._stage.on('wheel', e => {
         e.evt.preventDefault()
         let direction = e.evt.deltaY > 0 ? -1 : 1
         if (e.evt.ctrlKey) {
           direction = -direction
         }
-        
+
         const oldScale = this._stage.scaleX()
         let newScale = direction > 0 ? oldScale + 0.05 : oldScale - 0.05
         newScale = Math.min(Math.max(this.config.minZoom, Math.round(newScale * 100) / 100), this.config.maxZoom)
-        if(newScale === oldScale) {
+        if (newScale === oldScale) {
           return
         }
         const pointer = this._stage.getPointerPosition()!
@@ -231,12 +233,7 @@ export default class Arrange extends ArrangeGraph {
       fillLinearGradientStartPoint: { x: 0, y: 0 },
       fillLinearGradientEndPoint: { x: this._width, y: this._height },
       // gradient into transparent color, so we can see CSS styles
-      fillLinearGradientColorStops: [
-        0,
-        'rgb(222, 111, 111)',
-        1,
-        'rgb(111, 222, 111)',
-      ],
+      fillLinearGradientColorStops: [0, 'rgb(222, 111, 111)', 1, 'rgb(111, 222, 111)'],
     })
     this._layer.add(this._background)
   }
@@ -295,9 +292,7 @@ export default class Arrange extends ArrangeGraph {
     const countH = endYIndex - startYIndex
     const pointsH = Array.from({ length: countH }).flatMap((_, index) => {
       const y = gapV * (index + startYIndex)
-      return index % 2 === 0
-        ? [fromX - delta, y, toX + delta, y]
-        : [toX + delta, y, fromX - delta, y]
+      return index % 2 === 0 ? [fromX - delta, y, toX + delta, y] : [toX + delta, y, fromX - delta, y]
     })
 
     const startXIndex = Math.ceil((fromX - strokeWidth / 2) / gapH)
@@ -305,9 +300,7 @@ export default class Arrange extends ArrangeGraph {
     const countV = endXIndex - startXIndex
     const pointsV = Array.from({ length: countV }).flatMap((_, index) => {
       const x = gapH * (index + startXIndex)
-      return index % 2 === 0
-        ? [x, fromY - delta, x, toY + delta]
-        : [x, toY + delta, x, fromY - delta]
+      return index % 2 === 0 ? [x, fromY - delta, x, toY + delta] : [x, toY + delta, x, fromY - delta]
     })
 
     return [pointsH, pointsV]
@@ -315,10 +308,10 @@ export default class Arrange extends ArrangeGraph {
 
   #updateGridPoints() {
     const gridPos = this._grid!.absolutePosition()
-    const {x: scaleX, y: scaleY} = this._stage.scale()!
-    this._gridConfig.fromX = - gridPos.x / scaleX
+    const { x: scaleX, y: scaleY } = this._stage.scale()!
+    this._gridConfig.fromX = -gridPos.x / scaleX
     this._gridConfig.toX = this._gridConfig.fromX + this._width / scaleX
-    this._gridConfig.fromY = - gridPos.y / scaleY
+    this._gridConfig.fromY = -gridPos.y / scaleY
     this._gridConfig.toY = this._gridConfig.fromY + this._height / scaleY
     const [pointsH, pointsV] = this.#getGridPoints()
     const gridV = this._stage.findOne('#grid-v')! as Line
@@ -334,7 +327,7 @@ export default class Arrange extends ArrangeGraph {
       y: 0,
       draggable: false,
     })
-    this.getItems().edges.forEach((edge) => {
+    this.getItems().edges.forEach(edge => {
       if (edge.keyShape) {
         edgesGroup.add(edge.keyShape)
       }
@@ -346,7 +339,7 @@ export default class Arrange extends ArrangeGraph {
     let addEdges = this.getItems().edges
     const $edgesWrapper = this._layer.findOne<Group>('#edges-group')!
     // const edgeDoms = this.#layer.find('.edge')
-    $edgesWrapper.children.forEach((edge) => {
+    $edgesWrapper.children.forEach(edge => {
       const $line = edge as Line
       const id = $line.id().match(/^edge-(.+)$/)?.[1]
       if (!id) return
@@ -362,8 +355,13 @@ export default class Arrange extends ArrangeGraph {
       // update
       const cfg = this.getEdgeShape(id)!
       const source = this.getNodeShape(cfg.source)!
-      const target = this.getNodeShape(cfg.target)! 
-      $line.points([source.rect.x + source.rect.width / 2, source.rect.y, target.rect.x - target.rect.width / 2, target.rect.y])
+      const target = this.getNodeShape(cfg.target)!
+      $line.points([
+        source.rect.x + source.rect.width / 2,
+        source.rect.y,
+        target.rect.x - target.rect.width / 2,
+        target.rect.y,
+      ])
     })
     addEdges.forEach(edge => {
       const source = this.getNodeShape(edge.source)
@@ -383,9 +381,9 @@ export default class Arrange extends ArrangeGraph {
       y: 0,
       draggable: false,
     })
- 
-    this.getItems().nodes.forEach((node) => {
-      if(node.rootShape) {
+
+    this.getItems().nodes.forEach(node => {
+      if (node.rootShape) {
         nodesGroup.add(node.rootShape)
         if (node.afterAdd) {
           node.afterAdd(this)
@@ -425,16 +423,16 @@ export default class Arrange extends ArrangeGraph {
     if (contentRect) {
       contentRect.x(this.contentRect.x)
       contentRect.y(this.contentRect.y)
-      contentRect.size({width: this.contentRect.width, height: this.contentRect.height})
+      contentRect.size({ width: this.contentRect.width, height: this.contentRect.height })
     }
     const stageRect = this._layer!.findOne('#dev-stage')
     if (stageRect) {
-      stageRect.size({width: this._width, height: this._height})
+      stageRect.size({ width: this._width, height: this._height })
     }
   }
 
   #autoResize() {
-    this._resizeObserver = new ResizeObserver((entries) => {
+    this._resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         if (entry.contentBoxSize) {
           const contentBoxSize = entry.contentBoxSize[0]
@@ -451,7 +449,7 @@ export default class Arrange extends ArrangeGraph {
     if (this._resizeObserver) {
       this._resizeObserver.disconnect()
     }
-  
+
     this.offAll()
     this._stage.destroy()
     this._minimapStage?.destroy()
@@ -461,7 +459,7 @@ export default class Arrange extends ArrangeGraph {
     const x = this._stage.x()
     const y = this._stage.y()
     // const {x: scaleX, y:scaleY} = this.#stage.scale()!
-    const {width, height} = this._stage.size()
+    const { width, height } = this._stage.size()
 
     return this._stage.toDataURL({
       mimeType: 'image/png',
@@ -476,12 +474,12 @@ export default class Arrange extends ArrangeGraph {
     const padding = [100, 100, 100, 100]
     const originX = this._stage.x()
     const originY = this._stage.y()
-    const {x: scaleX, y:scaleY} = this._stage.scale()!
-    const newX =  scaleX * (- this.contentRect.x + padding[3])
-    const newY =  scaleY * (- this.contentRect.y + padding[0])
+    const { x: scaleX, y: scaleY } = this._stage.scale()!
+    const newX = scaleX * (-this.contentRect.x + padding[3])
+    const newY = scaleY * (-this.contentRect.y + padding[0])
     this._stage.x(newX)
     this._stage.y(newY)
-    
+
     const imgSize = {
       x: 0,
       y: 0,
@@ -489,23 +487,23 @@ export default class Arrange extends ArrangeGraph {
       height: scaleY * (this.contentRect.height + padding[0] + padding[2]),
     }
 
-    const {width: originWidth, height: OriginHeight} = this._stage.size()
+    const { width: originWidth, height: OriginHeight } = this._stage.size()
     const width = Math.max(originWidth, originX + this.contentRect.x + this.contentRect.width + padding[3])
     const height = Math.max(OriginHeight, originY + this.contentRect.y + this.contentRect.height + padding[2])
 
     this.resize(width, height)
-    this._background?.size({width: imgSize.width, height: imgSize.height })
+    this._background?.size({ width: imgSize.width, height: imgSize.height })
     this._background?.absolutePosition({ x: 0, y: 0 })
-  
+
     requestAnimationFrame(() => {
       this._stage.x(originX)
       this._stage.y(originY)
       this.resize(originWidth, OriginHeight)
-      this._background?.size({width: originWidth, height: OriginHeight })
+      this._background?.size({ width: originWidth, height: OriginHeight })
       this._background?.absolutePosition({ x: 0, y: 0 })
     })
 
-    return this._stage.toDataURL({mimeType: 'image/png', ...imgSize })
+    return this._stage.toDataURL({ mimeType: 'image/png', ...imgSize })
   }
 
   downloadPNG() {
@@ -527,7 +525,7 @@ export default class Arrange extends ArrangeGraph {
       container,
       width: this._width * scale,
       height: this._height * scale,
-      scale: {x: scale, y:scale},
+      scale: { x: scale, y: scale },
       listening: false,
     })
     this._minimapLayer = this._layer.clone({ listening: false })
@@ -551,19 +549,19 @@ export default class Arrange extends ArrangeGraph {
       return
     }
 
-    const {x, y} = this._stage.scale() || {x:1, y: 1}
-    const {x:poxX, y:poxY} = this._stage.position()
+    const { x, y } = this._stage.scale() || { x: 1, y: 1 }
+    const { x: poxX, y: poxY } = this._stage.position()
     const scale = (this.config.minimap as MinimapConfig).scale ?? 0.2
-    this._minimapStage.scale({x: x * scale, y: y * scale})
-    this._minimapStage.position({x: poxX * scale, y: poxY * scale})
+    this._minimapStage.scale({ x: x * scale, y: y * scale })
+    this._minimapStage.position({ x: poxX * scale, y: poxY * scale })
     // this.#minimapLayer.destroy()
     // this.#minimapLayer = this.#layer.clone({ listening: false })
     // this.#minimapStage.add(this.#minimapLayer)
 
     // we just need to update ALL nodes in the preview
-    this._layer.children.forEach((shape) => {
+    this._layer.children.forEach(shape => {
       let clone
-      if(shape.id()) {
+      if (shape.id()) {
         clone = this._minimapLayer!.findOne('#' + shape.id())
       } else if (shape.name()) {
         clone = this._minimapLayer!.findOne('.' + shape.name())
@@ -576,18 +574,18 @@ export default class Arrange extends ArrangeGraph {
     })
     const gridLineH = this._layer.findOne<Line>('#grid-h')
     if (gridLineH) {
-      this._minimapLayer!.findOne<Line>('#grid-h')!.points((gridLineH).points())
+      this._minimapLayer!.findOne<Line>('#grid-h')!.points(gridLineH.points())
     }
     const gridLineV = this._layer.findOne<Line>('#grid-v')
     if (gridLineV) {
-      this._minimapLayer!.findOne<Line>('#grid-v')!.points((gridLineV).points())
+      this._minimapLayer!.findOne<Line>('#grid-v')!.points(gridLineV.points())
     }
   }
 
   #scaleByPoint(pointer: Vector2d, newScale: number): void {
     const oldScale = this._stage.scaleX()
     newScale = Math.min(Math.max(this.config.minZoom, Math.round(newScale * 1000) / 1000), this.config.maxZoom)
-    if(newScale === oldScale) {
+    if (newScale === oldScale) {
       return
     }
 
@@ -608,7 +606,7 @@ export default class Arrange extends ArrangeGraph {
     if (this._grid) {
       this._gridLastPosition = this._grid.absolutePosition()
       this.#updateGridPoints()
-    } 
+    }
 
     if (this._background) {
       this._background.absolutePosition({ x: 0, y: 0 })
@@ -622,11 +620,11 @@ export default class Arrange extends ArrangeGraph {
 
   scale(scale: number, center?: boolean): boolean {
     if (scale >= this.config.minZoom && scale <= this.config.maxZoom) {
-      const s = Math.round(scale * 100) / 100 
+      const s = Math.round(scale * 100) / 100
       if (center) {
-        this.#scaleByPoint({x: this._width / 2, y: this._height / 2}, s)
+        this.#scaleByPoint({ x: this._width / 2, y: this._height / 2 }, s)
       } else {
-        this.#scaleByPoint({x: 0, y: 0}, s)
+        this.#scaleByPoint({ x: 0, y: 0 }, s)
       }
       return true
     }

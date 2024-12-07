@@ -6,15 +6,15 @@ import { Group } from 'konva/lib/Group'
 import { Shape } from 'konva/lib/Shape'
 
 export type EdgeCfg = {
-  id: string,
-  source: Node | Combo,
-  target: Node | Combo,
+  id: string
+  source: Node | Combo
+  target: Node | Combo
 }
 
 export interface IEdge extends IItemBase {
   itemType: 'edge'
-  source: Node | Combo,
-  target: Node | Combo,
+  source: Node | Combo
+  target: Node | Combo
   keyShape: Line | Group | Shape | null
 }
 
@@ -23,7 +23,7 @@ export class Edge extends ItemBase implements IEdge {
   source: Node | Combo
   target: Node | Combo
   keyShape: Line | Group | Shape | null = null
-  
+
   constructor(cfg: EdgeCfg) {
     super(cfg.id)
     this.source = cfg.source

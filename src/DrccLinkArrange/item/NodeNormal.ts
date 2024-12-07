@@ -12,7 +12,7 @@ export class NodeNormal extends Node {
   type = 'normal'
   width = 72
   height = 72
-  label = '' 
+  label = ''
 
   constructor(cfg: NodeNormalCfg) {
     super(cfg)
@@ -23,18 +23,25 @@ export class NodeNormal extends Node {
   getSize() {
     return [this.width, this.height] as [number, number]
   }
-  
+
   getRect() {
     return {
       x: this.x,
       y: this.y,
       width: this.width,
-      height: this.height + 16 * 2 + 4
+      height: this.height + 16 * 2 + 4,
     }
   }
 
   draw(): Group {
-    const id = this.id, width = this.width, height = this.height, x = this.x, y = this.y, iconBgSize = 48, iconSize = 32, _label = this.label
+    const id = this.id,
+      width = this.width,
+      height = this.height,
+      x = this.x,
+      y = this.y,
+      iconBgSize = 48,
+      iconSize = 32,
+      _label = this.label
 
     const group = new Konva.Group({
       id: `node-${id}-group`,
@@ -91,7 +98,7 @@ export class NodeNormal extends Node {
       height: iconSize,
       listening: false,
     })
-  
+
     const action = new Konva.Rect({
       id: `node-${id}-action`,
       x: 0,
@@ -147,9 +154,9 @@ export class NodeNormal extends Node {
       y: 0,
       width: 16,
       height: 16,
-      offset: {x: 8, y: 8},
+      offset: { x: 8, y: 8 },
       fill: '#afb5c7',
-      cornerRadius: 8
+      cornerRadius: 8,
     })
     const deleteX = new Konva.Path({
       id: `node-${id}-labelText`,
@@ -159,8 +166,8 @@ export class NodeNormal extends Node {
       y: 0,
       width: 16,
       height: 16,
-      offset: {x: 8, y: 8},
-      listening: false
+      offset: { x: 8, y: 8 },
+      listening: false,
     })
 
     group.add(bg)
@@ -188,8 +195,8 @@ export class NodeNormal extends Node {
   #eventBind(arrange: Arrange) {
     const deleteBtn = this.shapesMap.get('node-delete')
     if (deleteBtn) {
-      deleteBtn.on('click', (ev) => {
-        ev.cancelBubble  = true
+      deleteBtn.on('click', ev => {
+        ev.cancelBubble = true
         arrange.emit('node:click', {
           item: this,
           shapeName: 'node-delete',
@@ -200,13 +207,13 @@ export class NodeNormal extends Node {
           canvasY: ev.evt.clientY,
         })
       })
-      deleteBtn.on('mouseenter', (ev) => {
-        ev.cancelBubble  = true
+      deleteBtn.on('mouseenter', ev => {
+        ev.cancelBubble = true
         arrange.config.container.style.cursor = 'pointer'
         deleteBtn.fill('#ff3d55')
       })
-      deleteBtn.on('mouseout', (ev) => {
-        ev.cancelBubble  = true
+      deleteBtn.on('mouseout', ev => {
+        ev.cancelBubble = true
         arrange.config.container.style.cursor = 'default'
         deleteBtn.fill('#afb5c7')
       })
@@ -214,8 +221,8 @@ export class NodeNormal extends Node {
 
     const action = this.shapesMap.get('action')
     if (action) {
-      action.on('mouseenter', (ev) => {
-        ev.cancelBubble  = true
+      action.on('mouseenter', ev => {
+        ev.cancelBubble = true
         arrange.config.container.style.cursor = 'pointer'
         arrange.emit('node:mouseenter', {
           item: this,
@@ -227,8 +234,8 @@ export class NodeNormal extends Node {
           canvasY: ev.evt.clientY,
         })
       })
-      action.on('mouseout', (ev) => {
-        ev.cancelBubble  = true
+      action.on('mouseout', ev => {
+        ev.cancelBubble = true
         arrange.config.container.style.cursor = 'default'
         arrange.emit('node:mouseleave', {
           item: this,
@@ -244,8 +251,8 @@ export class NodeNormal extends Node {
 
     const label = this.shapesMap.get('label')
     if (label) {
-      label.on('mouseenter', (ev) => {
-        ev.cancelBubble  = true
+      label.on('mouseenter', ev => {
+        ev.cancelBubble = true
         arrange.config.container.style.cursor = 'pointer'
         arrange.emit('node:mouseenter', {
           item: this,
@@ -257,7 +264,7 @@ export class NodeNormal extends Node {
           canvasY: ev.evt.clientY,
         })
       })
-      label.on('mouseout', (ev) => {
+      label.on('mouseout', ev => {
         if (!arrange) return
         arrange.config.container.style.cursor = 'default'
         arrange.emit('node:mouseleave', {
@@ -273,7 +280,7 @@ export class NodeNormal extends Node {
     }
 
     const keyShape = this.rootShape
-    if(keyShape) {
+    if (keyShape) {
       keyShape.on('mouseenter', () => {
         arrange.config.container.style.cursor = 'default'
       })
@@ -296,7 +303,5 @@ export class NodeNormal extends Node {
       })
     }
   }
-  update(): void {
-
-  }
+  update(): void {}
 }

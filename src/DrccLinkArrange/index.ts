@@ -1,1 +1,1 @@
-export {default as Arrange} from './Arrange.ts'
+export { default as Arrange } from './Arrange.ts'

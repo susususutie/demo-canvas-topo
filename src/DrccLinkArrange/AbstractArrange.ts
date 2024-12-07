@@ -1,3 +1,1 @@
-interface IAbstractGraph {
-  
-}
+interface IAbstractGraph {}

@@ -2,4 +2,4 @@
 
 graph
 
-item -> node/edge/combo -> multi shape ->  
+item -> node/edge/combo -> multi shape ->

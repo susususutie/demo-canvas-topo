@@ -41,4 +41,3 @@ export class ItemBase implements IItemBase {
     this.destroyed = true
   }
 }
-

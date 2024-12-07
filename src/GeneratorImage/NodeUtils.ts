@@ -5,7 +5,7 @@ export default class NodeUtils extends BaseEvent {
     super()
   }
   /** 将文字截短, 避免超长溢出 */
-  truncateText(ctx: CanvasRenderingContext2D, text:string, maxWidth:number): string {
+  truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
     let str = ''
     const textList = Array.from(text)
     for (let index = 0; index < textList.length; index++) {
